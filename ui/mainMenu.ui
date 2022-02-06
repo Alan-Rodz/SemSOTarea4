@@ -113,8 +113,8 @@
    <widget class="QLabel" name="label_Logo">
     <property name="geometry">
      <rect>
-      <x>640</x>
-      <y>130</y>
+      <x>630</x>
+      <y>20</y>
       <width>321</width>
       <height>191</height>
      </rect>
@@ -130,7 +130,7 @@
     <property name="geometry">
      <rect>
       <x>600</x>
-      <y>340</y>
+      <y>240</y>
       <width>391</width>
       <height>41</height>
      </rect>
@@ -179,24 +179,24 @@
      <set>Qt::AlignCenter</set>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton">
+   <widget class="QPushButton" name="pbEvaluar">
     <property name="geometry">
      <rect>
       <x>890</x>
-      <y>410</y>
+      <y>310</y>
       <width>101</width>
       <height>31</height>
      </rect>
     </property>
     <property name="text">
-     <string>Comenzar</string>
+     <string>Evaluar</string>
     </property>
    </widget>
    <widget class="QTextEdit" name="textEdit_CantidadProcesos">
     <property name="geometry">
      <rect>
       <x>600</x>
-      <y>410</y>
+      <y>310</y>
       <width>281</width>
       <height>31</height>
      </rect>
@@ -563,6 +563,72 @@
     </property>
     <property name="alignment">
      <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_Estado">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>30</y>
+      <width>331</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="palette">
+     <palette>
+      <active>
+       <colorrole role="WindowText">
+        <brush brushstyle="SolidPattern">
+         <color alpha="255">
+          <red>255</red>
+          <green>255</green>
+          <blue>255</blue>
+         </color>
+        </brush>
+       </colorrole>
+      </active>
+      <inactive>
+       <colorrole role="WindowText">
+        <brush brushstyle="SolidPattern">
+         <color alpha="255">
+          <red>255</red>
+          <green>255</green>
+          <blue>255</blue>
+         </color>
+        </brush>
+       </colorrole>
+      </inactive>
+      <disabled>
+       <colorrole role="WindowText">
+        <brush brushstyle="SolidPattern">
+         <color alpha="255">
+          <red>190</red>
+          <green>190</green>
+          <blue>190</blue>
+         </color>
+        </brush>
+       </colorrole>
+      </disabled>
+     </palette>
+    </property>
+    <property name="text">
+     <string>Estado: Inicial</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pbComenzar">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>600</x>
+      <y>360</y>
+      <width>391</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Comenzar</string>
     </property>
    </widget>
   </widget>
