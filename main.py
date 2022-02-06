@@ -14,7 +14,6 @@ sistemaOperativo = SistemaOperativo()
 
 # Palettes - UI - Labels - Buttons - TextEdits - Functions
 class Ui_MainWindow(object):
-    # stop_signal = pyqtSignal()  # make a stop signal to communicate with the worker in another thread
 
     def setupUi(self, MainWindow):
         # *********************************************************************************************
@@ -230,33 +229,25 @@ class Ui_MainWindow(object):
         self.textEdit_ProcesosTerminados.setObjectName('textEdit_ProcesosTerminados')
 
         # =============================================================================================
-        # Thread:
-        # self.thread = QThread()
-        # self.worker = OSWorker()
-        # self.stop_signal.connect(self.worker.stop)              # connect stop signal to worker stop method
-        # self.worker.moveToThread(self.thread)
+        # Thread
+        self.thread = QThread()                                                 # Step 1: Create a QThread object
+        self.worker = OSWorker()                                                # Step 2: Create a worker object
+        self.worker.moveToThread(self.thread)                                   # Step 3: Move worker to the thread
+        self.thread.started.connect(self.worker.procesar)                       # Step 4: Connect signals and slots
 
-        # self.worker.finished.connect(self.thread.quit)          # connect the workers finished signal to stop thread
-        # self.worker.finished.connect(self.worker.deleteLater)   # connect the workers finished signal to clean up worker
-        # self.thread.finished.connect(self.thread.deleteLater)   # connect threads finished signal to clean up thread
+        self.worker.finished.connect(self.thread.quit)
+        self.worker.finished.connect(self.worker.deleteLater)
+        self.thread.finished.connect(self.thread.deleteLater)
+        
+        self.worker.progreso.connect(self.reportarProgreso)
 
-        # self.thread.started.connect(self.worker.do_work)
-        # self.thread.finished.connect(self.worker.stop)
-
-        # # Start Button action:
-        # self.pbComenzar.clicked.connect(self.thread.start)
-        # self.pbContinuar.clicked.connect(self.thread.start)
-
-        # # Stop Button action:
-        # self.pbPausar.clicked.connect(self.stop_thread)
-
-        # ---------------------------------------------------------------------------------------------
+        # .............................................................................................
         # Setup
         MainWindow.setCentralWidget(self.centralwidget)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     # =============================================================================================
-    # Functions
+    # Funciones - Setup
     def obtenerCantidadDeProcesos(self):
         cantidadProcesos = self.textEdit_CantidadProcesos.toPlainText()
         if (not cantidadProcesos.isnumeric()):
@@ -277,32 +268,21 @@ class Ui_MainWindow(object):
 
             self.label_LotesPendientes.setText( 'Número de Lotes Pendientes: {}'.format(str(len(sistemaOperativo.listaLotesPendientes))))
 
+    # ---------------------------------------------------------------------------------------------
+    # Funciones - Thread
     def procesar(self):
-        # Step 1: Create a QThread object
-        self.thread = QThread()
-        # Step 2: Create a worker object
-        self.worker = OSWorker()
-        # Step 4: Move worker to the thread
-        self.worker.moveToThread(self.thread)
-        # Step 5: Connect signals and slots
-        self.thread.started.connect(self.worker.do_work)
-        self.worker.finished.connect(self.thread.quit)
-        self.worker.finished.connect(self.worker.deleteLater)
-        self.thread.finished.connect(self.thread.deleteLater)
-        self.worker.progress.connect(self.reportarProgreso)
-        
-        # Step 6: Start the thread
-        self.thread.start()
-
-        # Final resets
-        # self.longRunningBtn.setEnabled(False)
-        # self.thread.finished.connect(lambda: self.longRunningBtn.setEnabled(True))
-        # self.thread.finished.connect(lambda: self.stepLabel.setText("Long-Running Step: 0"))
+        self.thread.start()          
+                                                           
 
     def reportarProgreso(self, n):
         self.textEdit_LoteActual.setText(f"{n}")
 
+    # When stop_btn is clicked this runs. Terminates the worker and the thread.
+    def stop_thread(self):
+        self.stop_signal.emit()  # emit the finished signal on stop
 
+    # ---------------------------------------------------------------------------------------------
+    # Funciones - Handlers
     def handleComenzar(self):
         self.pbComenzar.setEnabled(False)
         self.pbInterrumpir.setEnabled(True)
@@ -311,7 +291,6 @@ class Ui_MainWindow(object):
         self.pbContinuar.setEnabled(False)
         self.pbTerminar.setEnabled(True)
         self.procesar()
-
 
     def handleInterrumpir(self):
         pass
@@ -339,11 +318,7 @@ class Ui_MainWindow(object):
         self.pbPausar.setEnabled(False)
         self.pbContinuar.setEnabled(False)
         self.pbTerminar.setEnabled(False)
-        # sys.exit()
-
-    # When stop_btn is clicked this runs. Terminates the worker and the thread.
-    def stop_thread(self):
-        self.stop_signal.emit()  # emit the finished signal on stop
+        sys.exit()
 
 
 class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
