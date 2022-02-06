@@ -6,12 +6,9 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QTableWidget, QTableWidge
 import random
 import time
 
-from ClaseOSWorker import OSWorker
-from ClaseSistemaOperativo import SistemaOperativo
 from ClaseOSRunner import RunnerSistemaOperativo
 
 # *********************************************************************************************
-sistemaOperativo = SistemaOperativo()
 
 # Palettes - UI - Labels - Buttons - TextEdits - Functions
 class Ui_MainWindow(object):
@@ -21,6 +18,8 @@ class Ui_MainWindow(object):
     pausar = pyqtSignal() 
     reanudar = pyqtSignal()
     terminar = pyqtSignal()   
+    interrumpirProceso = pyqtSignal()
+    marcarErrorProceso = pyqtSignal()
 
     def setupUi(self, MainWindow):
         # *********************************************************************************************
@@ -262,23 +261,20 @@ class Ui_MainWindow(object):
             self.textEdit_CantidadProcesos.setEnabled(False)
             self.pbComenzar.setEnabled(True)
             self.pbEvaluar.setEnabled(False)
-            self.label_Estado.setText('Estado: {}'.format(sistemaOperativo.estado))
-            
-            sistemaOperativo.setCantidadProcesos(int(cantidadProcesos))
-            sistemaOperativo.generarProcesosAleatoriamente()
-            sistemaOperativo.particionarProcesosEnLotes()
-            sistemaOperativo.imprimirInformacionDiagnostica()
-
-            self.label_LotesPendientes.setText( 'Número de Lotes Pendientes: {}'.format(str(len(sistemaOperativo.listaLotesPendientes))))
+            self.label_Estado.setText('Estado: {}'.format(self.runnerSistemaOperativo.estado))
+            self.label_LotesPendientes.setText( 'Número de Lotes Pendientes: {}'.format(str(len(self.runnerSistemaOperativo.listaLotesPendientes))))
 
     # ---------------------------------------------------------------------------------------------
     # Funciones - Thread
-    def comenzarProcesamiento(self):
+    def comenzarProcesamiento(self, cantidadProcesos):
+        self.runnerSistemaOperativo.cantidadProcesos = int(cantidadProcesos)
+        self.runnerSistemaOperativo.generarProcesosAleatoriamente()
+        self.runnerSistemaOperativo.particionarProcesosEnLotes()
+        self.runnerSistemaOperativo.imprimirInformacionDiagnostica()
         self.threadpool.start(self.runnerSistemaOperativo)          
                                                            
     def actualizarProgreso(self, n):
         self.textEdit_LoteActual.setText(f"{n}")
-
 
     # ---------------------------------------------------------------------------------------------
     # Funciones - Handlers
@@ -289,7 +285,9 @@ class Ui_MainWindow(object):
         self.pbPausar.setEnabled(True)
         self.pbContinuar.setEnabled(False)
         self.pbTerminar.setEnabled(True)
-        self.comenzarProcesamiento()
+
+        cantidadProcesos = self.textEdit_CantidadProcesos.toPlainText()
+        self.comenzarProcesamiento(cantidadProcesos)
 
     def handleInterrumpir(self):
         pass
@@ -317,7 +315,6 @@ class Ui_MainWindow(object):
         self.pbPausar.setEnabled(False)
         self.pbContinuar.setEnabled(False)
         self.pbTerminar.setEnabled(False)
-        # sys.exit()
 
 
 class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):

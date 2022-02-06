@@ -1,3 +1,7 @@
+ESTADO_PROCESO_PENDIENTE = 'Pendiente'
+ESTADO_PROCESO_EJECUCION = 'Ejecucion'
+ESTADO_PROCESO_TERMINADO = 'Terminado'
+
 class Proceso:
     id = 0
     tme = 0
@@ -5,7 +9,7 @@ class Proceso:
     op1 = 0
     op2 = 0
     resultado = 0
-    estado = 'pendiente'
+    estado = ESTADO_PROCESO_PENDIENTE
     tt = 0
     tr = 0
     numlote = 0
@@ -27,7 +31,7 @@ class Proceso:
             self.resultado = op1 % op2
         else:
             self.resultado = 0
-        self.estado = 'pendiente'
+        self.estado = 'Pendiente'
         self.tt = 0
         self.tr = tme
         self.numlote = 0
@@ -35,13 +39,13 @@ class Proceso:
 
     # Override print Process Object
     def __str__(self):
-        if self.estado == 'pendiente':
+        if self.estado == ESTADO_PROCESO_PENDIENTE:
             return '(ID: {}, TME: {}, TT: {})'.format(self.id, self.tme, self.tt)
-        elif self.estado == 'ejecucion':
+        elif self.estado == ESTADO_PROCESO_EJECUCION:
             return ('ID: {}, OP: {}, TME: {}, TT: {}, TR: {}'.format(self.id, self.op, self.tme, self.tt, self.tr))
-        elif self.estado == 'terminado' and self.error == False:
+        elif self.estado == ESTADO_PROCESO_TERMINADO and self.error == False:
             return '(ID: {}, OP: {}, RESULTADO: {}, LOTE: {})'.format(self.id, self.op, self.resultado, self.numlote)
-        elif self.estado == 'terminado' and self.error == True:
+        elif self.estado == ESTADO_PROCESO_TERMINADO and self.error == True:
             return '(ID: {}, OP: {}, RESULTADO: ERROR, LOTE: {})'.format(self.id, self.op, self.resultado, self.numlote)
 
     # Override list of this Object Type

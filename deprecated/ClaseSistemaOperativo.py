@@ -28,11 +28,11 @@ rangoConCero = [i for i in range(-1000000, 1000000)]
 
 
 class SistemaOperativo:
-    listaLotesPendientes = []               # No Setter
+    listaLotesPendientes = []               
     loteActual = []                         
 
-    cantidadProcesos = 0                    # Setter
-    listaProcesos = []                      # No Setter
+    cantidadProcesos = 0                    
+    listaProcesos = []                      
     procesoActual = []                         
 
     procesosTerminados = []
