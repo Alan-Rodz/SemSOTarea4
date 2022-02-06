@@ -15,6 +15,11 @@ sistemaOperativo = SistemaOperativo()
 # Palettes - UI - Labels - Buttons - TextEdits - Functions
 class Ui_MainWindow(object):
 
+    # =============================================================================================
+    # Signals Setup
+    pausar = pyqtSignal() 
+    continuar = pyqtSignal()
+
     def setupUi(self, MainWindow):
         # *********************************************************************************************
         # Palettes
@@ -230,19 +235,24 @@ class Ui_MainWindow(object):
 
         # =============================================================================================
         # Thread
-        self.thread = QThread()                                                 # Step 1: Create a QThread object
-        self.worker = OSWorker()                                                # Step 2: Create a worker object
-        self.worker.moveToThread(self.thread)                                   # Step 3: Move worker to the thread
-        self.thread.started.connect(self.worker.procesar)                       # Step 4: Connect signals and slots
+        self.thread = QThread()                                                
+        self.worker = OSWorker()                                                
+
+        # ... Signals - UI-to-worker ..................................................................
+        self.pausar.connect(self.worker.pausar)                                   
+        self.continuar.connect(self.worker.continuar)
+        
+        
+        self.worker.moveToThread(self.thread)                                   
+        self.thread.started.connect(self.worker.procesar)                       
 
         self.worker.finished.connect(self.thread.quit)
         self.worker.finished.connect(self.worker.deleteLater)
         self.thread.finished.connect(self.thread.deleteLater)
-        
+
+        # ... Signals - Worker-to-UI ...................................................................
         self.worker.progreso.connect(self.reportarProgreso)
 
-        # .............................................................................................
-        # Setup
         MainWindow.setCentralWidget(self.centralwidget)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
@@ -270,16 +280,18 @@ class Ui_MainWindow(object):
 
     # ---------------------------------------------------------------------------------------------
     # Funciones - Thread
-    def procesar(self):
+    def comenzarProcesamiento(self):
         self.thread.start()          
                                                            
+    def pausarProcesamiento(self):
+        self.pausar.emit()  
+
+    def reanudarProcesamiento(self):
+        self.continuar.emit()
 
     def reportarProgreso(self, n):
         self.textEdit_LoteActual.setText(f"{n}")
 
-    # When stop_btn is clicked this runs. Terminates the worker and the thread.
-    def stop_thread(self):
-        self.stop_signal.emit()  # emit the finished signal on stop
 
     # ---------------------------------------------------------------------------------------------
     # Funciones - Handlers
@@ -290,7 +302,7 @@ class Ui_MainWindow(object):
         self.pbPausar.setEnabled(True)
         self.pbContinuar.setEnabled(False)
         self.pbTerminar.setEnabled(True)
-        self.procesar()
+        self.comenzarProcesamiento()
 
     def handleInterrumpir(self):
         pass
@@ -304,6 +316,7 @@ class Ui_MainWindow(object):
         self.pbPausar.setEnabled(False)
         self.pbContinuar.setEnabled(True)
         self.pbTerminar.setEnabled(True)
+        self.pausarProcesamiento()
 
     def handleContinuar(self):
         self.pbInterrumpir.setEnabled(True)
@@ -311,6 +324,7 @@ class Ui_MainWindow(object):
         self.pbPausar.setEnabled(True)
         self.pbContinuar.setEnabled(False)
         self.pbTerminar.setEnabled(True)
+        self.reanudarProcesamiento()
     
     def handleTerminar(self):
         self.pbInterrumpir.setEnabled(False)

@@ -2,24 +2,23 @@ from PyQt5.QtCore import QThread, QObject, pyqtSignal
 
 
 class OSWorker(QObject):
-    finished = pyqtSignal()         # give worker class a finished signal
+    finished = pyqtSignal()         
     progreso = pyqtSignal(int)
 
     def __init__(self, parent=None):
         QObject.__init__(self, parent=parent)
-        self.continuar_ejecucion = True  # provide a bool run condition for the class
+        self.continuar_ejecucion = True  
 
     def procesar(self):
         i = 1
-        while self.continuar_ejecucion:  # give the loop a stoppable condition
+        while self.continuar_ejecucion:  
             self.progreso.emit(i)
             QThread.sleep(1)
             i = i + 1
-        self.finished.emit()  # emit the finished signal when the loop is done
+        # self.finished.emit()  
 
-    def stop(self):
+    def pausar(self):
         self.continuar_ejecucion = False  # set the run condition to false on stop
 
-    def restart(self):
+    def continuar(self):
         self.continuar_ejecucion = True
-
