@@ -1,13 +1,14 @@
 import sys
 sys.path.insert(1, './class/')
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtCore import QThread, QObject, pyqtSignal
+from PyQt5.QtCore import QThread, QObject, pyqtSignal, QThreadPool
 from PyQt5.QtWidgets import QApplication, QMainWindow, QTableWidget, QTableWidgetItem, QWidget, QLabel, QPushButton
 import random
 import time
 
 from ClaseOSWorker import OSWorker
 from ClaseSistemaOperativo import SistemaOperativo
+from ClaseOSRunner import RunnerSistemaOperativo
 
 # *********************************************************************************************
 sistemaOperativo = SistemaOperativo()
@@ -18,7 +19,8 @@ class Ui_MainWindow(object):
     # =============================================================================================
     # Signals Setup
     pausar = pyqtSignal() 
-    continuar = pyqtSignal()
+    reanudar = pyqtSignal()
+    terminar = pyqtSignal()   
 
     def setupUi(self, MainWindow):
         # *********************************************************************************************
@@ -235,28 +237,19 @@ class Ui_MainWindow(object):
 
         # =============================================================================================
         # Thread
-        self.thread = QThread()                                                
-        self.worker = OSWorker()                                                
+        self.threadpool = QThreadPool()
+        self.runnerSistemaOperativo = RunnerSistemaOperativo()
+        self.runnerSistemaOperativo.señales.progreso.connect(self.actualizarProgreso)                       # Conectar la señal del runner a actualizar progreso aquí
 
-        # ... Signals - UI-to-worker ..................................................................
-        self.pausar.connect(self.worker.pausar)                                   
-        self.continuar.connect(self.worker.continuar)
-        
-        
-        self.worker.moveToThread(self.thread)                                   
-        self.thread.started.connect(self.worker.procesar)                       
-
-        self.worker.finished.connect(self.thread.quit)
-        self.worker.finished.connect(self.worker.deleteLater)
-        self.thread.finished.connect(self.thread.deleteLater)
-
-        # ... Signals - Worker-to-UI ...................................................................
-        self.worker.progreso.connect(self.reportarProgreso)
+        # ... Signals: UI - Runner ....................................................................
+        self.pbPausar.pressed.connect(self.runnerSistemaOperativo.pausar)
+        self.pbContinuar.pressed.connect(self.runnerSistemaOperativo.reanudar)
+        self.pbTerminar.pressed.connect(self.runnerSistemaOperativo.terminar)
 
         MainWindow.setCentralWidget(self.centralwidget)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
-    # =============================================================================================
+    # =================================================================================================
     # Funciones - Setup
     def obtenerCantidadDeProcesos(self):
         cantidadProcesos = self.textEdit_CantidadProcesos.toPlainText()
@@ -281,15 +274,9 @@ class Ui_MainWindow(object):
     # ---------------------------------------------------------------------------------------------
     # Funciones - Thread
     def comenzarProcesamiento(self):
-        self.thread.start()          
+        self.threadpool.start(self.runnerSistemaOperativo)          
                                                            
-    def pausarProcesamiento(self):
-        self.pausar.emit()  
-
-    def reanudarProcesamiento(self):
-        self.continuar.emit()
-
-    def reportarProgreso(self, n):
+    def actualizarProgreso(self, n):
         self.textEdit_LoteActual.setText(f"{n}")
 
 
@@ -316,7 +303,6 @@ class Ui_MainWindow(object):
         self.pbPausar.setEnabled(False)
         self.pbContinuar.setEnabled(True)
         self.pbTerminar.setEnabled(True)
-        self.pausarProcesamiento()
 
     def handleContinuar(self):
         self.pbInterrumpir.setEnabled(True)
@@ -324,7 +310,6 @@ class Ui_MainWindow(object):
         self.pbPausar.setEnabled(True)
         self.pbContinuar.setEnabled(False)
         self.pbTerminar.setEnabled(True)
-        self.reanudarProcesamiento()
     
     def handleTerminar(self):
         self.pbInterrumpir.setEnabled(False)
@@ -332,7 +317,7 @@ class Ui_MainWindow(object):
         self.pbPausar.setEnabled(False)
         self.pbContinuar.setEnabled(False)
         self.pbTerminar.setEnabled(False)
-        sys.exit()
+        # sys.exit()
 
 
 class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
