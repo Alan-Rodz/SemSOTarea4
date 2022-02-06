@@ -42,11 +42,11 @@ class Proceso:
         if self.estado == ESTADO_PROCESO_PENDIENTE:
             return '(ID: {}, TME: {}, TT: {})'.format(self.id, self.tme, self.tt)
         elif self.estado == ESTADO_PROCESO_EJECUCION:
-            return ('ID: {}, OP: {}, TME: {}, TT: {}, TR: {}'.format(self.id, self.op, self.tme, self.tt, self.tr))
+            return ('(ID: {}, OP: {}, TME: {}, TT: {}, TR: {})'.format(self.id, self.op, self.tme, self.tt, self.tr))
         elif self.estado == ESTADO_PROCESO_TERMINADO and self.error == False:
             return '(ID: {}, OP: {}, RESULTADO: {}, LOTE: {})'.format(self.id, self.op, self.resultado, self.numlote)
         elif self.estado == ESTADO_PROCESO_TERMINADO and self.error == True:
-            return '(ID: {}, OP: {}, RESULTADO: ERROR, LOTE: {})'.format(self.id, self.op, self.resultado, self.numlote)
+            return '(ID: {}, OP: {}, RESULTADO: ERROR)'.format(self.id, self.op, self.resultado)
 
     # Override list of this Object Type
 

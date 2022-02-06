@@ -136,7 +136,7 @@ class Ui_MainWindow(object):
         self.label_ProcesoEjecucion.setText('Proceso en ejecución:')
 
         self.label_ContadorGeneral = QtWidgets.QLabel(self.centralwidget)
-        self.label_ContadorGeneral.setGeometry(QtCore.QRect(30, 510, 121, 21))
+        self.label_ContadorGeneral.setGeometry(QtCore.QRect(30, 510, 141, 21))
         self.label_ContadorGeneral.setPalette(palette)
         self.label_ContadorGeneral.setAlignment(QtCore.Qt.AlignCenter)
         self.label_ContadorGeneral.setObjectName('label_ContadorGeneral')
@@ -183,6 +183,7 @@ class Ui_MainWindow(object):
         self.pbInterrumpir.setGeometry(QtCore.QRect(600, 460, 391, 41))
         self.pbInterrumpir.setObjectName('pbInterrumpir')
         self.pbInterrumpir.setText('Interrumpir Proceso Actual')
+        self.pbInterrumpir.clicked.connect(self.handleInterrumpir)
 
         self.pbPausar = QtWidgets.QPushButton(self.centralwidget)
         self.pbPausar.setEnabled(False)
@@ -196,6 +197,7 @@ class Ui_MainWindow(object):
         self.pbError.setGeometry(QtCore.QRect(600, 520, 391, 41))
         self.pbError.setObjectName('pbError')
         self.pbError.setText('Marcar Error en Proceso')
+        self.pbError.clicked.connect(self.handleError)
 
         self.pbEvaluar = QtWidgets.QPushButton(self.centralwidget)
         self.pbEvaluar.setGeometry(QtCore.QRect(890, 310, 101, 31))
@@ -241,6 +243,8 @@ class Ui_MainWindow(object):
         self.runnerSistemaOperativo.señales.progreso.connect(self.actualizarProgreso)                       # Conectar la señal del runner a actualizar progreso aquí
 
         # ... Signals: UI - Runner ....................................................................
+        self.pbInterrumpir.pressed.connect(self.runnerSistemaOperativo.interrumpir)
+        self.pbError.pressed.connect(self.runnerSistemaOperativo.error)
         self.pbPausar.pressed.connect(self.runnerSistemaOperativo.pausar)
         self.pbContinuar.pressed.connect(self.runnerSistemaOperativo.reanudar)
         self.pbTerminar.pressed.connect(self.runnerSistemaOperativo.terminar)
@@ -283,6 +287,7 @@ class Ui_MainWindow(object):
         self.textEdit_ProcesosTerminados.setText(f'{estadoGeneral[5]}')
         self.label_ContadorGeneral.setText(f'Contador General: {estadoGeneral[6]}')
         self.label_Estado.setText(f'Estado: {estadoGeneral[7]}')
+        self.label_Mensajes.setText('Programa en Ejecución')
     
 
     # ---------------------------------------------------------------------------------------------
@@ -299,10 +304,10 @@ class Ui_MainWindow(object):
         self.comenzarProcesamiento(cantidadProcesos)
 
     def handleInterrumpir(self):
-        pass
+        self.label_Mensajes.setText('Proceso Interrumpido')
 
     def handleError(self):
-        pass
+        self.label_Mensajes.setText('Proceso Abortado')
 
     def handlePausar(self):
         self.pbInterrumpir.setEnabled(False)
