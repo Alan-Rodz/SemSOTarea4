@@ -273,8 +273,24 @@ class Ui_MainWindow(object):
         self.runnerSistemaOperativo.imprimirInformacionDiagnostica()
         self.threadpool.start(self.runnerSistemaOperativo)          
                                                            
-    def actualizarProgreso(self, n):
-        self.textEdit_LoteActual.setText(f"{n}")
+    def actualizarProgreso(self, estadoGeneral):
+        # [0] = listaLotesPendientes
+        # [1] = loteActual
+        # [2] = cantidadProcesos
+        # [3] = listaProcesos
+        # [4] = procesoActual
+        # [5] = procesosTerminados
+        # [6] = contadorGlobal
+        # [7] = estadoSO
+        self.label_LotesPendientes.setText(f'Número de Lotes Pendientes: {len(estadoGeneral[0])}')
+        self.textEdit_LoteActual.setText(f'{estadoGeneral[0]}')
+        # estadoGeneral[2]
+        # estadoGeneral[3]
+        self.textEdit_ProcesoEjecucion.setText(f'{estadoGeneral[4]}')
+        self.textEdit_ProcesosTerminados.setText(f'{estadoGeneral[5]}')
+        self.label_ContadorGeneral.setText(f'Contador General: {estadoGeneral[6]}')
+        self.label_Estado.setText(f'Estado: {estadoGeneral[7]}')
+    
 
     # ---------------------------------------------------------------------------------------------
     # Funciones - Handlers

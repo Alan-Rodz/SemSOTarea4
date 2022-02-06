@@ -14,6 +14,8 @@ LIMPIAR_PANTALLA = 'clear'
 ESTADO_SO_INICIAL = 'Inicial'
 ESTADO_SO_PROCESAR = 'Procesando'
 ESTADO_SO_PAUSA = 'Pausado'
+ESTADO_SO_INTERRUMPIR = 'Interrumpir'
+ESTADO_SO_ERROR = 'Error'
 ESTADO_SO_TERMINAR = 'Terminado'
 
 ESTADO_PROCESO_PENDIENTE = 'Pendiente'
@@ -25,21 +27,28 @@ rangoConCero = [i for i in range(-1000000, 1000000)]
 
 # --------------------------------------------------------------------------------------------------------------------------
 class SistemaOperativoSignals(QObject):
-    progreso = pyqtSignal(int)
+    # Regresamos una lista con todo el estado del programa en un momento particular
+    # [0] = listaLotesPendientes
+    # [1] = loteActual
+    # [2] = cantidadProcesos
+    # [3] = listaProcesos
+    # [4] = procesoActual
+    # [5] = procesosTerminados
+    # [6] = contadorGlobal
+    # [7] = estadoSO
+ 
+    progreso = pyqtSignal(list)                 
 
 # --------------------------------------------------------------------------------------------------------------------------
 class RunnerSistemaOperativo(QRunnable):    
 
     # Enviadas desde aquí hacia la GUI
-    señales = SistemaOperativoSignals()                        
-
+    señales = SistemaOperativoSignals()    
+                    
     # ====================================================================================================================
     # Inicialización
     def __init__(self):
         super().__init__()
-        self.esta_pausado = False
-        self.esta_terminado = False
-
         self.listaLotesPendientes = []
         self.loteActual = []
 
@@ -50,6 +59,8 @@ class RunnerSistemaOperativo(QRunnable):
         self.procesosTerminados = []
         self.contadorGlobal = 0 
         self.estado = ESTADO_SO_INICIAL
+        self.estadoGeneral = []
+
 
     def generarProcesosAleatoriamente(self):
         for i in range(self.cantidadProcesos):
@@ -89,7 +100,10 @@ class RunnerSistemaOperativo(QRunnable):
     @pyqtSlot()
     def run(self):
         for n in range(100):
-            self.señales.progreso.emit(n + 1)
+            self.estadoGeneral = [self.listaLotesPendientes, self.loteActual, self.cantidadProcesos, self.listaProcesos, 
+                self.procesoActual, self.procesosTerminados, self.contadorGlobal, self.estado]
+            self.señales.progreso.emit(self.estadoGeneral)
+          
             print(self.cantidadProcesos)
             time.sleep(1)
             
