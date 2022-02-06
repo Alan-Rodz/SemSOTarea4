@@ -8,17 +8,17 @@ from ClaseProceso import Proceso
 TAMAÑO_LOTE = 5
 VELOCIDAD_PROCESAMIENTO = 1
 TIEMPO_ESPERA_LOTES = 8
-LIMPIAR_PANTALLA = "clear"
+LIMPIAR_PANTALLA = 'clear'
 
 # ====================================================================================================================
-ESTADO_INICIAL = "inicial"
-ESTADO_PROCESAR = "procesar"
-ESTADO_PAUSA = "pausa"
-ESTADO_TERMINAR = "terminar"
+ESTADO_INICIAL = 'Inicial'
+ESTADO_PROCESAR = 'Procesando'
+ESTADO_PAUSA = 'Pausado'
+ESTADO_TERMINAR = 'Terminado'
 
-TECLA_PAUSA = "p"
-TECLA_CONTINUAR = "c"
-TECLA_TERMINAR = "x"
+TECLA_PAUSA = 'p'
+TECLA_CONTINUAR = 'c'
+TECLA_TERMINAR = 'x'
 
 # ====================================================================================================================
 rangoSinCero = [i for i in range(-1000000, 1000000) if i not in [0]]
@@ -28,17 +28,17 @@ rangoConCero = [i for i in range(-1000000, 1000000)]
 
 
 class SistemaOperativo:
-    listaLotesPendientes = []
-    loteActual = []
+    listaLotesPendientes = []               # No Setter
+    loteActual = []                         
 
-    cantidadProcesos = 0
-    listaProcesos = []
-    procesoActual = []
+    cantidadProcesos = 0                    # Setter
+    listaProcesos = []                      # No Setter
+    procesoActual = []                         
 
     procesosTerminados = []
     contadorGlobal = 0
 
-    estado = "inicial"
+    estado = ESTADO_INICIAL
 
     # ====================================================================================================================
     # Inicialización
@@ -49,25 +49,22 @@ class SistemaOperativo:
         self.listaProcesos = []
         self.procesosTerminados = []
         self.contadorGlobal = 0
-        self.estado = "inicial"
-
-    def setCantidadProcesos(self, cantidad):
-        self.cantidadProcesos = cantidad
+        self.estado = ESTADO_INICIAL
 
     def generarProcesosAleatoriamente(self):
         for i in range(self.cantidadProcesos):
             idSecuencial = i
             tmeAleatorio = random.randint(6, 16)
-            operacionAleatoria = random.choice(["+", "-", "/", "%"])
+            operacionAleatoria = random.choice(['+', '-', '/', '%'])
 
-            if (operacionAleatoria == "/" or operacionAleatoria == "%"):
+            if (operacionAleatoria == '/' or operacionAleatoria == '%'):
                 operando1Aleatorio = random.choice(rangoSinCero)
                 operando2Aleatorio = random.choice(rangoSinCero)
             else:
                 operando1Aleatorio = random.choice(rangoConCero)
                 operando2Aleatorio = random.choice(rangoConCero)
 
-            estadoDefinido = "pendiente"
+            estadoDefinido = 'pendiente'
             tiempoTotalAleatorio = tmeAleatorio
             tiempoRestanteDefinido = 0
 
@@ -89,58 +86,20 @@ class SistemaOperativo:
         self.listaLotesPendientes = lotes
 
     # ====================================================================================================================
-    # Procesamiento - Actualización de Estados
-    def actualizarEstadoProcesar(self):
-        self.estado = ESTADO_PROCESAR
-
-    def actualizarEstadoPausa(self):
-        self.estado = ESTADO_PAUSA
-
-    def actualizarEstadoTerminar(self):
-        self.estado = ESTADO_TERMINAR
+    # Setters
+    def setCantidadProcesos(self, cantidad):
+        self.cantidadProcesos = cantidad
 
     # ====================================================================================================================
-    # Procesamiento - Estados
-    def estadoPausa(self):
-        # --------------------------------------------
-        while self.estado == ESTADO_PAUSA:
-            # do something
-            if keyboard.is_pressed("c"):
-                self.actualizarEstadoProcesar()
-                break
-            elif keyboard.is_pressed("x"):
-                self.actualizarEstadoTerminar()()
-                break
-            else:
-                self.imprimirInformacionDiagnostica()
+    # Getters
 
     # ====================================================================================================================
-    def estadoProcesar(self):
-        self.actualizarEstadoProcesar()
-        # ----------------------------------------------------------------------------------------
-        while self.estado == ESTADO_PROCESAR:
-            # do something
-            if keyboard.is_pressed("p"):
-                self.actualizarEstadoPausa()
-                input("Ingresa C para Continuar")
-            elif keyboard.is_pressed("x"):
-                self.actualizarEstadoTerminar()()
-                break
-            else:
-                self.imprimirInformacionDiagnostica()
-                time.sleep(1)
-
-    # ====================================================================================================================
-    # Utilidades de impresión
-
+    # Utilidades
     def imprimirInformacionDiagnostica(self):
         os.system(LIMPIAR_PANTALLA)
-        a = random.choice(['1', '2', '3'])
-        print("Numero aleatorio: {}".format(a))
-        print("Estado: {}".format(self.estado))
-        print("Cantidad de Lotes Pendientes: {}".format(
-            len(self.listaLotesPendientes)))
-        print("Lote Actual: {}".format(self.loteActual))
-        print("Proceso En Ejecución: {}".format(self.procesoActual))
-        print("Procesos Terminados: {}".format(self.procesosTerminados))
-        print("Contador Global: {}".format(self.contadorGlobal))
+        print('Estado: {}'.format(self.estado))
+        print('Cantidad de Lotes Pendientes: {}'.format(len(self.listaLotesPendientes)))
+        print('Lote Actual: {}'.format(self.loteActual))
+        print('Proceso En Ejecución: {}'.format(self.procesoActual))
+        print('Procesos Terminados: {}'.format(self.procesosTerminados))
+        print('Contador Global: {}'.format(self.contadorGlobal))
