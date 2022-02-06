@@ -270,20 +270,13 @@ class Ui_MainWindow(object):
         self.runnerSistemaOperativo.cantidadProcesos = int(cantidadProcesos)
         self.runnerSistemaOperativo.generarProcesosAleatoriamente()
         self.runnerSistemaOperativo.particionarProcesosEnLotes()
-        self.runnerSistemaOperativo.imprimirInformacionDiagnostica()
         self.threadpool.start(self.runnerSistemaOperativo)          
                                                            
     def actualizarProgreso(self, estadoGeneral):
-        # [0] = listaLotesPendientes
-        # [1] = loteActual
-        # [2] = cantidadProcesos
-        # [3] = listaProcesos
-        # [4] = procesoActual
-        # [5] = procesosTerminados
-        # [6] = contadorGlobal
-        # [7] = estadoSO
+        # [0] = listaLotesPendientes, [1] = loteActual, [2] = cantidadProcesos, [3] = listaProcesos
+        # [4] = procesoActual, [5] = procesosTerminados, [6] = contadorGlobal, [7] = estadoSO
         self.label_LotesPendientes.setText(f'Número de Lotes Pendientes: {len(estadoGeneral[0])}')
-        self.textEdit_LoteActual.setText(f'{estadoGeneral[0]}')
+        self.textEdit_LoteActual.setText(f'{estadoGeneral[1]}')
         # estadoGeneral[2]
         # estadoGeneral[3]
         self.textEdit_ProcesoEjecucion.setText(f'{estadoGeneral[4]}')

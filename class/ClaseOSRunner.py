@@ -7,7 +7,7 @@ from ClaseProceso import Proceso
 
 # **************************************************************************************************************************
 TAMAÑO_LOTE = 5
-VELOCIDAD_PROCESAMIENTO = 1
+VELOCIDAD_PROCESAMIENTO = 0.1
 TIEMPO_ESPERA_LOTES = 8
 LIMPIAR_PANTALLA = 'clear'
 
@@ -64,7 +64,7 @@ class RunnerSistemaOperativo(QRunnable):
 
     def generarProcesosAleatoriamente(self):
         for i in range(self.cantidadProcesos):
-            idSecuencial = i
+            idSecuencial = i+1
             tmeAleatorio = random.randint(6, 16)
             operacionAleatoria = random.choice(['+', '-', '/', '%'])
 
@@ -99,19 +99,37 @@ class RunnerSistemaOperativo(QRunnable):
     # Ejecución
     @pyqtSlot()
     def run(self):
-        for n in range(100):
-            self.estadoGeneral = [self.listaLotesPendientes, self.loteActual, self.cantidadProcesos, self.listaProcesos, 
-                self.procesoActual, self.procesosTerminados, self.contadorGlobal, self.estado]
-            self.señales.progreso.emit(self.estadoGeneral)
-          
-            print(self.cantidadProcesos)
-            time.sleep(1)
+        
+        # Lista Lotes
+        while (len(self.listaLotesPendientes) != 0):
             
-            while self.estado == ESTADO_SO_PAUSA:
-                time.sleep(0)
+            # Lote Individual
+            self.loteActual = self.listaLotesPendientes.pop(0)
+            while (len(self.loteActual) != 0):
+                while (self.estado == ESTADO_SO_PAUSA):
+                    time.sleep(0)                
+                self.procesoActual = self.loteActual.pop(0)
+                self.procesoActual.estado = ESTADO_PROCESO_EJECUCION
+                self.emitirEstado()
                 
+                # Proceso Individual
+                while (self.procesoActual.tt != self.procesoActual.tme):
+                    while (self.estado == ESTADO_SO_PAUSA):
+                        time.sleep(0)
+                    self.procesoActual.estado = ESTADO_PROCESO_EJECUCION                
+                    self.procesoActual.tt += 1
+                    self.procesoActual.tr -= 1
+                    self.emitirEstado()
+                self.procesosTerminados.append(self.procesoActual)
+                self.emitirEstado()
+                self.procesoActual = []
+            self.emitirEstado()
+
+            while self.estado == ESTADO_SO_PAUSA:
+                time.sleep(0)                
             if self.estado == ESTADO_SO_TERMINAR:
                 break
+
 
     # ====================================================================================================================
     # Control de Estados
@@ -135,3 +153,11 @@ class RunnerSistemaOperativo(QRunnable):
         print('Procesos Terminados: {}'.format(self.procesosTerminados))
         print('Contador Global: {}'.format(self.contadorGlobal))
 
+    def emitirEstado(self):
+        self.señales.progreso.emit(self.getEstadoGeneral())
+        time.sleep(VELOCIDAD_PROCESAMIENTO)
+
+
+    def getEstadoGeneral(self):
+        return [self.listaLotesPendientes, self.loteActual, self.cantidadProcesos, self.listaProcesos, 
+                self.procesoActual, self.procesosTerminados, self.contadorGlobal, self.estado]
